@@ -68,7 +68,7 @@ void connect_to_bootloader()
 {
   int res = -1;
   int state = Connecting;
-  u8 dataBuff[1050];
+  u8 dataBuff[1050];// = "0xAA, 0XCC, 0x00, 0x00, 0x00, 0x00, 0x2A";
   int headerLen = 0;
   int p = 0;
   int page = 0;
@@ -81,6 +81,16 @@ void connect_to_bootloader()
     switch(state) {
 
       case Connecting:
+        printf("Reset Micro..\n");
+        dataBuff[0] = 0xAA;
+        dataBuff[1] = 0xCC;
+        dataBuff[2] = 0x00;
+        dataBuff[3] = 0x00;
+        dataBuff[4] = 0x00;
+        dataBuff[5] = 0x00;
+        dataBuff[6] = 0x2C;
+	ser_write( stm32_ser_id, dataBuff, 7 );  //reset firmware
+
         printf("Connecting..\n");
         //Command_GetVersion
         int n = 0;
@@ -198,6 +208,7 @@ void connect_to_bootloader()
           ser_write( stm32_ser_id, dataBuff, headerLen );  //send data
         }else{
           printf("Upgrade Finished\n" );
+          printf("Send reset command\n" );
           ser_write_byte( stm32_ser_id, Command_Reset ); //send reset command
           //ser_write( stm32_ser_id, dataBuff, headerLen );  //send data
           exit(0);
